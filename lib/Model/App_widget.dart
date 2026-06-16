@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+import 'package:revisai/Model/Page/auth/Login_page.dart';
+
+class AppWidget extends StatelessWidget{
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+      ),
+      initialRoute: '/login',
+      routes: {
+        '/login' : (context) => LoginPage(),
+      } ,
+    );
+  }
+
+    
+}

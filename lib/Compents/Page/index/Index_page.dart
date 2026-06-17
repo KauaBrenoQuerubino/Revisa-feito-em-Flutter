@@ -105,7 +105,7 @@ class _IndexPageState extends State<IndexPage> {
                 fontFamily: 'Poppins-bold'
               ),
             ),
-            DecksWidget()
+            Expanded(child: DecksWidget()),
           ],
         ),
       ),

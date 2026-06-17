@@ -11,7 +11,6 @@ class DecksWidget extends StatefulWidget {
 class _DecksWidgetState extends State<DecksWidget> {
 
   Widget _deck(Deck Deck) {
-
     return Container(
       height: 100,
       decoration: BoxDecoration(
@@ -19,14 +18,14 @@ class _DecksWidgetState extends State<DecksWidget> {
         color: const Color.fromARGB(255, 199, 235, 252)
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10.0, 10.0, 20.0, 10.0),
+        padding: const EdgeInsets.fromLTRB(5.0, 10.0, 20.0, 10.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               height: 100,
-              width: 100,
+              width: 70,
               
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20)
@@ -35,30 +34,33 @@ class _DecksWidgetState extends State<DecksWidget> {
               child: Image.asset("assets/images/Categoria1.png", fit: BoxFit.cover,),
 
             ),
-
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  Deck.nome,
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 0, 31, 84),
-                    fontFamily: "Poppins-bold",
-                    fontSize: 15
-                  ),
-                ),
-                Text(
-                  "Total: ${Deck.flashcards.length}",
+            SizedBox(width: 5,),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    Deck.nome,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        color: Color.fromARGB(255, 0, 31, 84),
-                        fontSize: 15
+                      color: Color.fromARGB(255, 0, 31, 84),
+                      fontFamily: "Poppins-bold",
+                      fontSize: 17
                     ),
-                )
-              ],
+                  ),
+                  Text(
+                    "Total: ${Deck.flashcards.length}",
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 0, 31, 84),
+                          fontSize: 15
+                      ),
+                  )
+                ],
+              ),
             ),
-             SizedBox(width: 10),
-               Column(
+              Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -142,18 +144,24 @@ class _DecksWidgetState extends State<DecksWidget> {
   @override
   Widget build(BuildContext context) {
     List<Deck> decks = [
-      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}])
+      Deck(nome: "Programacao Java1111111111111111111111111111111111111111111111", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
+      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
+      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
+      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
+      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
+      Deck(nome: "Programacao Jav2", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}])
     ];
 
 
-    return Column(
-        children: [
-          Container(height: 20,),
-           ...decks.map(
-              (deck) => _deck(deck),
-            ),
-            Container(height: 20,),
-        ],
+    return ListView.separated(
+      padding: EdgeInsets.symmetric(vertical: 20), // 👈 espaço topo e fim
+      itemCount: decks.length,
+      itemBuilder: (context, index) {
+        return _deck(decks[index]);
+      },
+      separatorBuilder: (context, index) {
+        return SizedBox(height: 12); // 👈 espaço entre os decks
+      },
     );
   }
 }

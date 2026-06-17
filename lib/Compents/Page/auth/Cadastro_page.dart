@@ -25,7 +25,7 @@ class _CadastroPageState extends State<CadastroPage> {
             height: 150,
             child: Image.asset("assets/images/Logo.png"),
           ),
-          Container(height: 100),
+          Container(height: 30),
           Padding(
             padding: const EdgeInsets.fromLTRB(50.0, 10.0, 50.0, 10.0),
             child: Column(
@@ -148,8 +148,10 @@ class _CadastroPageState extends State<CadastroPage> {
                         }
                       }, 
                     ),
+
                   ],
                 ),
+                
               ],
             ),
           )

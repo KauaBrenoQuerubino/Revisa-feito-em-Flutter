@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:revisai/Compents/Page/index/Utils/Menu_widget.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -166,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
             width: MediaQuery.of(context).size.width,
             child: Image.asset("assets/images/background_primary.png", fit: BoxFit.cover),
           ),
-          _body()
+          _body(),
         ],
       ),
     );

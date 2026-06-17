@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           Container(height: 100),
           Padding(
-            padding: const EdgeInsets.fromLTRB(100.0, 10.0, 100.0, 10.0),
+            padding: const EdgeInsets.fromLTRB(50.0, 10.0, 50.0, 10.0),
             child: Column(
               children: [
                 Container(
@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pushNamed(context, '/cadastro');
+                            Navigator.pushNamed(context, '/cadastra-se');
                           },
                         )
                         

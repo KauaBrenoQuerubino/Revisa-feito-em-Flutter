@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:revisai/Model/Page/auth/Login_page.dart';
+import 'package:revisai/Compents/Page/auth/Cadastro_page.dart';
+import 'package:revisai/Compents/Page/auth/Login_page.dart';
 
 class AppWidget extends StatelessWidget{
 
@@ -14,6 +15,7 @@ class AppWidget extends StatelessWidget{
       initialRoute: '/login',
       routes: {
         '/login' : (context) => LoginPage(),
+        '/cadastra-se' : (context) => CadastroPage(),
       } ,
     );
   }

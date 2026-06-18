@@ -144,12 +144,7 @@ class _DecksWidgetState extends State<DecksWidget> {
   @override
   Widget build(BuildContext context) {
     List<Deck> decks = [
-      Deck(nome: "Programacao Java1111111111111111111111111111111111111111111111", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
-      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
-      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
-      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
-      Deck(nome: "Programacao Java", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}]),
-      Deck(nome: "Programacao Jav2", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}])
+      Deck(nome: "Programacao Java1111111111111111111111111111111111111111111111", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}], id: ''),
     ];
 
 

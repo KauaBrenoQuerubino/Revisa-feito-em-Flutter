@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:revisai/Compents/Page/index/Utils/Menu_widget.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -64,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pushNamed(context, '/cadastra-se');
+                            Navigator.pushNamed(context, '/cadastrar');
                           },
                         )
                         
@@ -139,13 +141,10 @@ class _LoginPageState extends State<LoginPage> {
                         backgroundColor: Color(0xFF001F54) // cor do texto
                     ),
                       child: Text('Entrar'),
-                      onPressed: () {
-                        if(email == 'Teste' && senha == '123'){
-                          Navigator.of(context).pushReplacementNamed('/home');
-                        }else{
-                          print('error');
-                        }
-                      }, 
+                      onPressed: () async {
+
+                      }
+                       
                     ),
                   ],
                 ),

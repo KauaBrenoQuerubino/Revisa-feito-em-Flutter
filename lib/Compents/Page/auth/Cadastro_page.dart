@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:revisai/Compents/model/Usuario.dart';
+import 'package:revisai/Compents/service/usuario/Usuario_service.dart';
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({super.key});
@@ -10,8 +12,11 @@ class CadastroPage extends StatefulWidget {
 
 class _CadastroPageState extends State<CadastroPage> {
 
-  String email = '';
-  String senha = '';
+  Usuario usuario = Usuario(nome: '', email: '', senha: '');
+
+  String confirmarSenha = '';
+
+  final usuarioService = UsuarioService();
 
   Widget _body() {
     return SizedBox(
@@ -75,7 +80,7 @@ class _CadastroPageState extends State<CadastroPage> {
                 Column(
                   children: [
                     TextField(
-                      onChanged: (value) => email = value,
+                      onChanged: (value) => usuario.nome = value,
                       keyboardType: TextInputType.name,
                       decoration: InputDecoration(
                         labelText: 'Seu Nome',
@@ -89,7 +94,7 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
                      Container(height: 10),
                     TextField(
-                      onChanged: (value) => email = value,
+                      onChanged: (value) => usuario.email = value,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: 'Email',
@@ -104,8 +109,7 @@ class _CadastroPageState extends State<CadastroPage> {
                     Container(height: 10),
                     TextField(
                       obscureText: true,
-                      onChanged: (value) => senha = value,
-                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (value) =>  usuario.senha = value,
                       decoration: InputDecoration(
                         labelText: 'Senha',
                         filled: true,
@@ -119,8 +123,7 @@ class _CadastroPageState extends State<CadastroPage> {
                     Container(height: 10),
                     TextField(
                       obscureText: true,
-                      onChanged: (value) => senha = value,
-                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (value) => confirmarSenha = value,
                       decoration: InputDecoration(
                         labelText: 'Confirmar Senha',
                         filled: true,
@@ -140,18 +143,12 @@ class _CadastroPageState extends State<CadastroPage> {
                         backgroundColor: Color(0xFF001F54) // cor do texto
                     ),
                       child: Text('Criar conta'),
-                      onPressed: () {
-                        if(email == 'Teste' && senha == '123'){
-                          Navigator.of(context).pushReplacementNamed('/home');
-                        }else{
-                          print('error');
-                        }
-                      }, 
+                       onPressed: () {
+                        usuarioService.salvarUsuario(usuario);
+                       }
                     ),
-
                   ],
                 ),
-                
               ],
             ),
           )

@@ -18,6 +18,14 @@ class AppWidget extends StatelessWidget{
       {
         "pergunta": "test554",
         "resposta": "teste resposta"
+      },
+      {
+        "pergunta": "test554",
+        "resposta": "teste resposta"
+      },
+      {
+        "pergunta": "test554",
+        "resposta": "teste resposta"
       }
     ];
 
@@ -30,11 +38,11 @@ class AppWidget extends StatelessWidget{
       theme: ThemeData(
         fontFamily: 'Poppins',
       ),
-      initialRoute: '/',
+      initialRoute: '/cadastrar',
       routes: {
-        '/' : (context) => FlashcardPage(perguntas: perguntas,),
+        '/' : (context) => IndexPage(),
         '/login' : (context) => LoginPage(),
-        '/cadastra-se' : (context) => CadastroPage(),
+        '/cadastrar' : (context) => CadastroPage(),
       } ,
     );
   }

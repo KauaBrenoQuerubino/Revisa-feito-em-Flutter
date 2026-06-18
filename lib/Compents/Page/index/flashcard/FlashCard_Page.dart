@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:revisai/Compents/model/Deck.dart';
 
 class FlashcardPage extends StatefulWidget {
-  final Map<String, String> perguntas;
+  final List<Map<String, String>> perguntas;
   const FlashcardPage({Key? key, required this.perguntas}) : super(key: key);
 
   @override
@@ -11,6 +11,7 @@ class FlashcardPage extends StatefulWidget {
 
 class _FlashcardPageState extends State<FlashcardPage> {
   bool mostrarResposta = false;
+  int index = 0; // 👈 agora é estado
 
   Widget _flashcard(Map<String, String> perguntas) {
     return Container(
@@ -42,13 +43,30 @@ class _FlashcardPageState extends State<FlashcardPage> {
   }
 
   Widget _body() {
-    Map<String, String> perguntas = {
-      "pergunta": "O que é Flutter?",
-      "resposta": "Um framework para criar apps.",
-    };
+
 
     return Center(
-      child: _flashcard(perguntas),
+      child: Column(
+        children: [
+        _flashcard(widget.perguntas[index]),
+         IconButton(
+            onPressed: () {
+
+              print(widget.perguntas[index]);
+
+              setState(() {
+
+              
+              if (index < widget.perguntas.length - 1) {
+                index++;
+                mostrarResposta = false; // reseta ao trocar
+              }
+            });
+            },
+            icon: Icon(Icons.folder, color: Colors.white),
+          ),
+        ],
+      )
     );
   }
 

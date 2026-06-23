@@ -1,14 +1,24 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
+import 'package:revisai/Compents/Page/index/flashcard/FlashCard_Page.dart';
 import 'package:revisai/Compents/model/Deck.dart';
+import 'package:revisai/Compents/service/decks/Decks_service.dart';
 
 class DecksWidget extends StatefulWidget {
-  const DecksWidget({super.key});
+
+  final String? idUsuario;
+
+  const DecksWidget({super.key, required this.idUsuario,});
 
   @override
   State<DecksWidget> createState() => _DecksWidgetState();
 }
 
 class _DecksWidgetState extends State<DecksWidget> {
+
+  DecksService service = DecksService();
+
 
   Widget _deck(Deck Deck) {
     return Container(
@@ -41,7 +51,7 @@ class _DecksWidgetState extends State<DecksWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    Deck.nome,
+                    Deck.titulo,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -65,7 +75,7 @@ class _DecksWidgetState extends State<DecksWidget> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  " 2 dias",
+                  "",
                    style: TextStyle(
                         color: Color.fromARGB(255, 0, 31, 84),
                         fontSize: 15
@@ -82,7 +92,9 @@ class _DecksWidgetState extends State<DecksWidget> {
                         borderRadius: BorderRadius.circular(4),
                     ),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          abrirModal(context, Deck);
+                        },
                         icon: Icon(
                           Icons.add,
                           color: Colors.white,
@@ -118,7 +130,15 @@ class _DecksWidgetState extends State<DecksWidget> {
                         borderRadius: BorderRadius.circular(4),
                     ),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          if(Deck.flashcards.length > 0) {
+
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (BuildContext context) =>  
+                                FlashcardPage(perguntas: Deck.flashcards)),
+                            );
+                          }
+                        },
                         icon: Icon(
                           Icons.play_arrow,
                           color: Colors.white,
@@ -141,21 +161,122 @@ class _DecksWidgetState extends State<DecksWidget> {
   }
 
 
+  void abrirModal(BuildContext context, Deck deck) {
+    final perguntaController = TextEditingController();
+    final respostaController = TextEditingController();
+
+    String pergunta = '';
+    String resposta = '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "Novo Flashcard",
+            textAlign: TextAlign.start,
+              style: TextStyle(
+                color: const Color.fromARGB(255, 0, 31, 84),
+                fontSize: 25,
+        
+                fontFamily: 'Poppins-bold'
+              ),
+            ),
+          content: 
+          Column(
+            children: [
+              TextField(
+                controller: perguntaController,
+                onChanged: (value) => pergunta = value,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'pergunta',
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 199, 199, 199),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide.none,
+                  ),
+                )        
+              ),
+              TextField(
+                controller: respostaController,
+                onChanged: (value) => resposta = value,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'resposta',
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 199, 199, 199),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide.none,
+                  ),
+                )        
+              ),
+            ],
+          ),
+        
+          actions: [
+            TextButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color(0xFF001F54) // cor do texto
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancelar"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color(0xFF001F54) // cor do texto
+              ),
+              
+              onPressed: () {
+                deck.flashcards.add({
+                  "pergunta": pergunta,
+                  "resposta": resposta
+                });
+
+                service.atualizarDeck(deck);
+              },
+              child: Text("Salvar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Deck> decks = [
-      Deck(nome: "Programacao Java1111111111111111111111111111111111111111111111", titulo: "TesteTitulo", flashcards: [{"teste":"teste"}], id: ''),
-    ];
+    return FutureBuilder<List<Deck>>(
+      future: service.listarDecksDoUsuario("QW9ylT9wLLR9gKcSSoIq"),
+      builder: (context, snapshot) {
+        
+      
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          print(snapshot.error); // 👈 MOSTRA NO CONSOLE
+          return Center(child: Text("Erro: ${snapshot.error}"));
+        }
+
+        final decks = snapshot.data ?? [];
 
 
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(vertical: 20), // 👈 espaço topo e fim
-      itemCount: decks.length,
-      itemBuilder: (context, index) {
-        return _deck(decks[index]);
-      },
-      separatorBuilder: (context, index) {
-        return SizedBox(height: 12); // 👈 espaço entre os decks
+
+        return ListView.separated(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          itemCount: decks.length,
+          itemBuilder: (context, index) {
+            print(decks[index].flashcards);
+            return _deck(decks[index]);
+          },
+          separatorBuilder: (_, __) => SizedBox(height: 12),
+        );
       },
     );
   }

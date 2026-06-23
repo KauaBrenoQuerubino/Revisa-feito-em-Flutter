@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:revisai/Compents/Page/index/Utils/Menu_widget.dart';
+import 'package:revisai/Compents/model/Usuario.dart';
+import 'package:revisai/Compents/service/auth/auth_service.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -15,6 +17,8 @@ class _LoginPageState extends State<LoginPage> {
 
   String email = '';
   String senha = '';
+
+  AuthService service = AuthService();
 
   Widget _body() {
     return SizedBox(
@@ -142,7 +146,21 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                       child: Text('Entrar'),
                       onPressed: () async {
+                        try {
 
+                          Usuario? usuario = await service.login(email, senha);
+
+                          if(usuario != null) {
+                            Navigator.pushNamed(context, "/", arguments: usuario);
+                          }
+                        }catch(e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(e.toString()),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                        
                     ),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:revisai/Compents/Page/index/Utils/Menu_widget.dart';
 import 'package:revisai/Compents/Page/index/decks/Decks_widget.dart';
+import 'package:revisai/Compents/model/Deck.dart';
+import 'package:revisai/Compents/model/Usuario.dart';
+import 'package:revisai/Compents/service/decks/Decks_service.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -11,8 +14,9 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
 
+  DecksService service = DecksService();
 
-  Widget _NavBar(){
+  Widget _NavBar(String nome){
      return Container(
       width: double.infinity,
       height: 230.0,
@@ -57,7 +61,7 @@ class _IndexPageState extends State<IndexPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                          "Olá, usuarioName",
+                          "Olá, ${nome}",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                           color: Colors.white,
@@ -87,7 +91,7 @@ class _IndexPageState extends State<IndexPage> {
     );
   }
 
-  Widget _body() {
+  Widget _body(String? idUsuario) {
    return Padding(
      padding: const EdgeInsets.all(20.0),
      child: Container(
@@ -105,7 +109,7 @@ class _IndexPageState extends State<IndexPage> {
                 fontFamily: 'Poppins-bold'
               ),
             ),
-            Expanded(child: DecksWidget()),
+            Expanded(child: DecksWidget(idUsuario: idUsuario,)),
           ],
         ),
       ),
@@ -113,17 +117,83 @@ class _IndexPageState extends State<IndexPage> {
   }
 
 
+  void abrirModal(BuildContext context, String? idUsuario) {
+    final nomeController = TextEditingController();
 
+    Deck deck = Deck(
+      idUsuario: idUsuario, 
+      titulo: '', 
+      flashcards: []
+    );
 
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "Novo deck",
+            textAlign: TextAlign.start,
+              style: TextStyle(
+                color: const Color.fromARGB(255, 0, 31, 84),
+                fontSize: 25,
+        
+                fontFamily: 'Poppins-bold'
+              ),
+            ),
+          content: TextField(
+            controller: nomeController,
+            onChanged: (value) => deck.titulo = value,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              labelText: 'Nome',
+              filled: true,
+              fillColor: const Color.fromARGB(255, 199, 199, 199),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide.none,
+              ),
+            )        
+          ),
+          actions: [
+            TextButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color(0xFF001F54) // cor do texto
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancelar"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color(0xFF001F54) // cor do texto
+              ),
+              
+              onPressed: () {
+                service.salvarDeck(deck);
+              },
+              child: Text("Salvar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+ 
 
 
   @override
   Widget build(BuildContext context) {
+
+    final usuario = ModalRoute.of(context)!.settings.arguments as Usuario;
+
     return Scaffold(
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(top: 50.0),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            abrirModal(context, usuario.id);
+          },
           shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(50), )
           , backgroundColor: Color(0xFF004B87),
            child: Icon(Icons.add, color: Colors.white),
@@ -136,8 +206,8 @@ class _IndexPageState extends State<IndexPage> {
 
       body: Column(
         children: [
-          _NavBar(),
-         Expanded(child:  _body(), ),
+          _NavBar(usuario.nome),
+         Expanded(child:  _body(usuario.id), ),
         ],
       ),
     );

@@ -5,40 +5,14 @@ import 'package:revisai/Compents/Page/index/Index_page.dart';
 import 'package:revisai/Compents/Page/index/flashcard/FlashCard_Page.dart';
 
 class AppWidget extends StatelessWidget{
-
-    List<Map<String, String>> perguntas = [
-     {
-        "pergunta": "teste4",
-        "resposta": "teste resposta"
-      },
-      {
-        "pergunta": "test54",
-        "resposta": "teste resposta"
-      },
-      {
-        "pergunta": "test554",
-        "resposta": "teste resposta"
-      },
-      {
-        "pergunta": "test554",
-        "resposta": "teste resposta"
-      },
-      {
-        "pergunta": "test554",
-        "resposta": "teste resposta"
-      }
-    ];
-
-
   @override
   Widget build(BuildContext context) {
-
 
     return MaterialApp(
       theme: ThemeData(
         fontFamily: 'Poppins',
       ),
-      initialRoute: '/cadastrar',
+      initialRoute: '/login',
       routes: {
         '/' : (context) => IndexPage(),
         '/login' : (context) => LoginPage(),

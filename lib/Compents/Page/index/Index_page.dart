@@ -135,15 +135,13 @@ class _IndexPageState extends State<IndexPage> {
             textAlign: TextAlign.start,
               style: TextStyle(
                 color: const Color.fromARGB(255, 0, 31, 84),
-                fontSize: 25,
-        
+                fontSize: 20,
                 fontFamily: 'Poppins-bold'
               ),
             ),
           content: TextField(
             controller: nomeController,
             onChanged: (value) => deck.titulo = value,
-            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               labelText: 'Nome',
               filled: true,

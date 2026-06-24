@@ -1,5 +1,6 @@
 import 'dart:js_interop';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:revisai/Compents/Page/index/flashcard/FlashCard_Page.dart';
 import 'package:revisai/Compents/model/Deck.dart';
@@ -93,7 +94,7 @@ class _DecksWidgetState extends State<DecksWidget> {
                     ),
                       child: IconButton(
                         onPressed: () {
-                          abrirModal(context, Deck);
+                          gerarFlashcard(context, Deck);
                         },
                         icon: Icon(
                           Icons.add,
@@ -160,8 +161,163 @@ class _DecksWidgetState extends State<DecksWidget> {
     );
   }
 
+  Future<String> selecionarArquivo() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-  void abrirModal(BuildContext context, Deck deck) {
+    if (result != null) {
+      var file = result.files.first;
+      return file.name;
+    } else {
+      return "nenhum arquivo selecionado";
+    }
+  }
+
+  void gerarFlashcard(BuildContext context, Deck deck) {
+    final conteudoController = TextEditingController();
+
+    String conteudo = '';
+    double valor = 1;
+    String arquivo = "nenhum arquivo selecionado";
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(
+                "Gerar Flashcard",
+                style: TextStyle(
+                  color: Color.fromARGB(255, 0, 31, 84),
+                  fontSize: 20,
+                  fontFamily: 'Poppins-bold',
+                ),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: conteudoController,
+                      onChanged: (value) => conteudo = value,
+                      maxLines: 5,
+                      minLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Descrever Conteúdo',
+                        filled: true,
+                        fillColor: Color.fromARGB(255, 199, 199, 199),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    Container(height: 20,),
+                    Text(
+                      "Nome do arquivo: $arquivo", 
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                    ),
+                    Container(height: 10,),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Color(0xFF001F54) // cor do texto
+                      ),
+                      onPressed: () async {
+                        final nome = await selecionarArquivo();
+
+                        setState(() {
+                          arquivo = nome;
+                        });
+                                              
+                        },
+                      child: Text("Selecionar arquivo"),
+                    ),
+
+                    SizedBox(height: 30),
+
+                    Text("Quantidade: ${valor.toInt()}"),
+
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: Color(0xFF001F54),     // parte preenchida
+                        inactiveTrackColor: const Color.fromARGB(255, 173, 173, 173),   // parte vazia
+                        thumbColor: Color(0xFF001F54),            // bolinha
+                        overlayColor: Color(0xFF001F54).withOpacity(0.2), // efeito ao clicar
+
+                        trackHeight: 6, // altura da barra
+
+                        thumbShape: RoundSliderThumbShape(
+                          enabledThumbRadius: 10, // tamanho da bolinha
+                        ),
+
+                        overlayShape: RoundSliderOverlayShape(
+                          overlayRadius: 20,
+                        ),
+
+                        valueIndicatorColor: Colors.black, // fundo do label
+                        valueIndicatorTextStyle: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      child: Slider(
+                        value: valor,
+                        min: 1,
+                        max: 25,
+                        divisions: 24,
+                        label: valor.toInt().toString(),
+                        onChanged: (novoValor) {
+                          setState(() {
+                            valor = novoValor;
+                          });
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF001F54) // cor do texto
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF001F54) // cor do texto
+                  ),
+                  
+                  onPressed: () async {
+
+                    final data = await service.gerarFlashcards(conteudo, valor as int);
+                    for (int i = 0; i < data.length; i++) {
+                      deck.flashcards.add({
+                        "pergunta": data[i]['pergunta'],
+                        "resposta": data[i]['resposta']
+                      });
+                    }
+                    service.atualizarDeck(deck);
+                  
+                  },
+                  child: Text("Gerar"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  
+
+
+  void novoFlashcard(BuildContext context, Deck deck) {
     final perguntaController = TextEditingController();
     final respostaController = TextEditingController();
 
@@ -177,18 +333,18 @@ class _DecksWidgetState extends State<DecksWidget> {
             textAlign: TextAlign.start,
               style: TextStyle(
                 color: const Color.fromARGB(255, 0, 31, 84),
-                fontSize: 25,
+                fontSize: 20,
         
                 fontFamily: 'Poppins-bold'
               ),
             ),
           content: 
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: perguntaController,
                 onChanged: (value) => pergunta = value,
-                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'pergunta',
                   filled: true,
@@ -199,10 +355,10 @@ class _DecksWidgetState extends State<DecksWidget> {
                   ),
                 )        
               ),
+              Container(height: 10,),
               TextField(
                 controller: respostaController,
                 onChanged: (value) => resposta = value,
-                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'resposta',
                   filled: true,
@@ -241,6 +397,7 @@ class _DecksWidgetState extends State<DecksWidget> {
               },
               child: Text("Salvar"),
             ),
+            
           ],
         );
       },
@@ -253,14 +410,12 @@ class _DecksWidgetState extends State<DecksWidget> {
       future: service.listarDecksDoUsuario("QW9ylT9wLLR9gKcSSoIq"),
       builder: (context, snapshot) {
         
-      
 
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
-          print(snapshot.error); // 👈 MOSTRA NO CONSOLE
           return Center(child: Text("Erro: ${snapshot.error}"));
         }
 

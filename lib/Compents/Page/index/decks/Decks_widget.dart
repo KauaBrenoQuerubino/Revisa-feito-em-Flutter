@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:js_interop';
 
 import 'package:file_picker/file_picker.dart';
@@ -19,6 +20,7 @@ class DecksWidget extends StatefulWidget {
 class _DecksWidgetState extends State<DecksWidget> {
 
   DecksService service = DecksService();
+
 
 
   Widget _deck(Deck Deck) {
@@ -94,7 +96,7 @@ class _DecksWidgetState extends State<DecksWidget> {
                     ),
                       child: IconButton(
                         onPressed: () {
-                          gerarFlashcard(context, Deck);
+                          novoFlashcard(context, Deck);
                         },
                         icon: Icon(
                           Icons.add,
@@ -105,7 +107,7 @@ class _DecksWidgetState extends State<DecksWidget> {
                       ),
                     ),
                      Container(width: 5,),
-                       Container(
+                      Container(
                       width: 23,
                       height: 23,
                       decoration: BoxDecoration(
@@ -113,7 +115,9 @@ class _DecksWidgetState extends State<DecksWidget> {
                         borderRadius: BorderRadius.circular(4),
                     ),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          editarDeck(context, Deck);
+                        },
                         icon: Icon(
                           Icons.edit,
                           color: Colors.white,
@@ -133,7 +137,6 @@ class _DecksWidgetState extends State<DecksWidget> {
                       child: IconButton(
                         onPressed: () {
                           if(Deck.flashcards.length > 0) {
-
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (BuildContext context) =>  
                                 FlashcardPage(perguntas: Deck.flashcards)),
@@ -161,14 +164,14 @@ class _DecksWidgetState extends State<DecksWidget> {
     );
   }
 
-  Future<String> selecionarArquivo() async {
+  Future<PlatformFile?> selecionarArquivo() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       var file = result.files.first;
-      return file.name;
+      return file;
     } else {
-      return "nenhum arquivo selecionado";
+      return null;
     }
   }
 
@@ -177,7 +180,8 @@ class _DecksWidgetState extends State<DecksWidget> {
 
     String conteudo = '';
     double valor = 1;
-    String arquivo = "nenhum arquivo selecionado";
+    bool carregando = false;
+    PlatformFile? arquivo = null;
 
     showDialog(
       context: context,
@@ -195,119 +199,176 @@ class _DecksWidgetState extends State<DecksWidget> {
               ),
               content: SizedBox(
                 width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: conteudoController,
-                      onChanged: (value) => conteudo = value,
-                      maxLines: 5,
-                      minLines: 3,
-                      decoration: InputDecoration(
-                        labelText: 'Descrever Conteúdo',
-                        filled: true,
-                        fillColor: Color.fromARGB(255, 199, 199, 199),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25),
-                          borderSide: BorderSide.none,
+                child: Stack(
+                children: [
+                   IgnorePointer(
+                      ignoring: carregando,
+                      child: Opacity(
+                        opacity: carregando ? 0.4 : 1,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                               Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  controller: conteudoController,
+                                  onChanged: (value) => conteudo = value,
+                                  maxLines: 5,
+                                  minLines: 3,
+                                  decoration: InputDecoration(
+                                    labelText: 'Descrever Conteúdo',
+                                    filled: true,
+                                    fillColor: Color.fromARGB(255, 199, 199, 199),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                                Container(height: 20,),
+                                Text(
+                                  "Nome do arquivo: ${arquivo?.name}", 
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                ),
+                                Container(height: 10,),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Color(0xFF001F54) // cor do texto
+                                  ),
+                                  onPressed: () async {
+                                    final file = await selecionarArquivo();
+
+                                    setState(() {
+                                      arquivo = file;
+                                    });
+                                                          
+                                    },
+                                  child: Text("Selecionar arquivo"),
+                                ),
+
+                                SizedBox(height: 30),
+
+                                Text("Quantidade: ${valor.toInt()}"),
+
+                                SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    activeTrackColor: Color(0xFF001F54),     // parte preenchida
+                                    inactiveTrackColor: const Color.fromARGB(255, 173, 173, 173),   // parte vazia
+                                    thumbColor: Color(0xFF001F54),            // bolinha
+                                    overlayColor: Color(0xFF001F54).withOpacity(0.2), // efeito ao clicar
+
+                                    trackHeight: 6, // altura da barra
+
+                                    thumbShape: RoundSliderThumbShape(
+                                      enabledThumbRadius: 10, // tamanho da bolinha
+                                    ),
+
+                                    overlayShape: RoundSliderOverlayShape(
+                                      overlayRadius: 20,
+                                    ),
+
+                                    valueIndicatorColor: Colors.black, // fundo do label
+                                    valueIndicatorTextStyle: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  child: Slider(
+                                    value: valor,
+                                    min: 1,
+                                    max: 25,
+                                    divisions: 24,
+                                    label: valor.toInt().toString(),
+                                    onChanged: (novoValor) {
+                                      setState(() {
+                                        valor = novoValor;
+                                      });
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    Container(height: 20,),
-                    Text(
-                      "Nome do arquivo: $arquivo", 
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                    ),
-                    Container(height: 10,),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Color(0xFF001F54) // cor do texto
-                      ),
-                      onPressed: () async {
-                        final nome = await selecionarArquivo();
-
-                        setState(() {
-                          arquivo = nome;
-                        });
-                                              
-                        },
-                      child: Text("Selecionar arquivo"),
-                    ),
-
-                    SizedBox(height: 30),
-
-                    Text("Quantidade: ${valor.toInt()}"),
-
-                    SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: Color(0xFF001F54),     // parte preenchida
-                        inactiveTrackColor: const Color.fromARGB(255, 173, 173, 173),   // parte vazia
-                        thumbColor: Color(0xFF001F54),            // bolinha
-                        overlayColor: Color(0xFF001F54).withOpacity(0.2), // efeito ao clicar
-
-                        trackHeight: 6, // altura da barra
-
-                        thumbShape: RoundSliderThumbShape(
-                          enabledThumbRadius: 10, // tamanho da bolinha
-                        ),
-
-                        overlayShape: RoundSliderOverlayShape(
-                          overlayRadius: 20,
-                        ),
-
-                        valueIndicatorColor: Colors.black, // fundo do label
-                        valueIndicatorTextStyle: TextStyle(
-                          color: Colors.white,
+                   ),
+                    if (carregando)
+                      Positioned.fill(
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 10),
+                              Text("Gerando flashcards...")
+                            ],
+                          ),
                         ),
                       ),
-                      child: Slider(
-                        value: valor,
-                        min: 1,
-                        max: 25,
-                        divisions: 24,
-                        label: valor.toInt().toString(),
-                        onChanged: (novoValor) {
-                          setState(() {
-                            valor = novoValor;
-                          });
-                        },
-                      ),
-                    )
-                  ],
+                ]   
                 ),
               ),
-              actions: [
-                TextButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Color(0xFF001F54) // cor do texto
+                actions: [
+                  TextButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xFF001F54) // cor do texto
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("Cancelar"),
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("Cancelar"),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Color(0xFF001F54) // cor do texto
-                  ),
-                  
-                  onPressed: () async {
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xFF001F54) // cor do texto
+                    ),
+                    
+                onPressed: () async {
+                    setState(() {
+                      carregando = true;
+                    });
 
-                    final data = await service.gerarFlashcards(conteudo, valor as int);
-                    for (int i = 0; i < data.length; i++) {
-                      deck.flashcards.add({
-                        "pergunta": data[i]['pergunta'],
-                        "resposta": data[i]['resposta']
+                    try {
+                      if (arquivo == null) {
+                        final data = await service.gerarFlashcards(
+                          conteudo,
+                          valor.toInt(),
+                        );
+
+                        for (var item in data) {
+                          deck.flashcards.add({
+                            "pergunta": item["pergunta"],
+                            "resposta": item["resposta"],
+                          });
+                        }
+                      } else {
+                        final data = await service.gerarFlashcardsPorPDF(
+                          arquivo!,
+                          valor.toInt(),
+                        );
+
+                        for (var item in data) {
+                          deck.flashcards.add({
+                            "pergunta": item["pergunta"],
+                            "resposta": item["resposta"],
+                          });
+                        }
+                      }
+
+                      await service.atualizarDeck(deck);
+
+                      Navigator.pop(context);
+                    } finally {
+                      setState(() {
+                        carregando = false;
                       });
                     }
-                    service.atualizarDeck(deck);
-                  
                   },
-                  child: Text("Gerar"),
-                ),
-              ],
+                    child: Text("Gerar"),
+                  ),
+                ],
             );
           },
         );
@@ -315,8 +376,6 @@ class _DecksWidgetState extends State<DecksWidget> {
     );
   }
   
-
-
   void novoFlashcard(BuildContext context, Deck deck) {
     final perguntaController = TextEditingController();
     final respostaController = TextEditingController();
@@ -328,16 +387,26 @@ class _DecksWidgetState extends State<DecksWidget> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(
-            "Novo Flashcard",
-            textAlign: TextAlign.start,
-              style: TextStyle(
-                color: const Color.fromARGB(255, 0, 31, 84),
-                fontSize: 20,
-        
-                fontFamily: 'Poppins-bold'
-              ),
-            ),
+          title: Row(
+            children: [
+              Text(
+                "Novo Flashcard",
+                textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 0, 31, 84),
+                    fontSize: 20,
+                      
+                    fontFamily: 'Poppins-bold'
+                  ),
+                ),
+                IconButton(onPressed: () {
+                  gerarFlashcard(context, deck);
+                }, style: ButtonStyle(
+                   foregroundColor: WidgetStatePropertyAll( Colors.white),
+                   backgroundColor:  WidgetStatePropertyAll(Color(0xFF001F54))
+                ) , icon: Icon(Icons.smart_toy))
+            ],
+          ),
           content: 
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -404,6 +473,87 @@ class _DecksWidgetState extends State<DecksWidget> {
     );
   }
 
+  void editarDeck(BuildContext context, Deck deck) {
+    final tituloController = TextEditingController(text: deck.titulo);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "Editar Deck",
+            style: TextStyle(
+              color: Color.fromARGB(255, 0, 31, 84),
+              fontSize: 20,
+              fontFamily: 'Poppins-bold',
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: tituloController,
+                onChanged: (value) => {deck.titulo = value},
+                decoration: InputDecoration(
+                  labelText: 'Título',
+                  filled: true,
+                  fillColor: Color.fromARGB(255, 199, 199, 199),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+
+            Row(
+                children: [
+                TextButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    service.deletarDeck(deck.id);
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.delete, size: 16),
+                      SizedBox(width: 4),
+                      Text("Apagar"),
+                    ],
+                  ),
+                ),
+                Container(width: 2,),
+                TextButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF001F54),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancelar"),
+                ),
+                Container(width: 2,),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF001F54),
+                  ),
+                  onPressed: () {
+                    service.atualizarDeck(deck);
+                  },
+                  child: Text("Salvar"),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Deck>>(

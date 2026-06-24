@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:revisai/Compents/model/Deck.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -21,6 +24,13 @@ class DecksService {
           .collection('decks')
           .doc(deck.id)
           .update(deck.toMap());
+    }
+
+    Future<void> deletarDeck(String? id) async {
+      await _db
+        .collection('decks')
+        .doc(id)
+        .delete();
     }
   
     Future<List<Deck>> listarDecksDoUsuario(String idUsuario) async {
@@ -73,4 +83,50 @@ class DecksService {
         return [];
       }
     }
+
+    Future<List<Map<String, dynamic>>> gerarFlashcardsPorPDF(
+      PlatformFile arquivo,
+      int quantidade,
+    ) async {
+      try {
+        var request = http.MultipartRequest(
+          "POST",
+          Uri.parse("http://127.0.0.1:8000/gerar-flashcards-arquivo"),
+        );
+
+        request.fields["quantidade"] = quantidade.toString();
+
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            "arquivo",
+            arquivo.bytes!,
+            filename: arquivo.name,
+          ),
+        );
+
+        final response = await request.send();
+
+        final responseBody =
+            await response.stream.bytesToString();
+
+        if (response.statusCode == 200) {
+          final List<dynamic> data =
+              jsonDecode(responseBody);
+
+          return data
+              .map((e) => Map<String, dynamic>.from(e))
+              .toList();
+        }
+
+        throw Exception("Erro ${response.statusCode}");
+      } catch (e) {
+        print(e);
+        return [];
+      }
+    }
+
+
+
+
+
 }

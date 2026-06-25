@@ -169,6 +169,7 @@ class _IndexPageState extends State<IndexPage> {
               
               onPressed: () {
                 service.salvarDeck(deck);
+                Navigator.pop(context);
               },
               child: Text("Salvar"),
             ),
@@ -200,7 +201,7 @@ class _IndexPageState extends State<IndexPage> {
       floatingActionButtonLocation:
           FloatingActionButtonLocation.centerDocked,
 
-      bottomNavigationBar: MenuWidget(),
+      bottomNavigationBar: MenuWidget(usuario: usuario,),
 
       body: Column(
         children: [

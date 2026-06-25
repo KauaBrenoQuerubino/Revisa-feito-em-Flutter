@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:revisai/Compents/model/Usuario.dart';
 
 class MenuWidget extends StatelessWidget {
-  const MenuWidget({super.key});
 
-
-
-  
-
+  final Usuario usuario;
+  const MenuWidget({super.key, required this.usuario});
   @override
   Widget build(BuildContext context) {
+
+
+    
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       child: Container(
@@ -27,11 +28,15 @@ class MenuWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  
+                },
                 icon: Icon(Icons.home, color: Colors.white),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, "/deck", arguments: usuario);
+                },
                 icon: Icon(Icons.folder, color: Colors.white),
               ),
               SizedBox(width: 40),

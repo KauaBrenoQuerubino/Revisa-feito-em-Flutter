@@ -35,7 +35,7 @@ class DecksService {
   
     Future<List<Deck>> listarDecksDoUsuario(String idUsuario) async {
 
-
+    
       final resultado = await _db
           .collection('decks')
           .where('idUsuario', isEqualTo: idUsuario)
@@ -46,7 +46,6 @@ class DecksService {
       print("Docs encontrados: ${resultado.docs.length}");
 
       return resultado.docs.map((doc) {
-        print(doc.data());
         return Deck.fromMap(doc.id, doc.data());
       }).toList();
 

@@ -22,7 +22,6 @@ class _DecksWidgetState extends State<DecksWidget> {
   DecksService service = DecksService();
 
 
-
   Widget _deck(Deck Deck) {
     return Container(
       height: 100,
@@ -137,10 +136,7 @@ class _DecksWidgetState extends State<DecksWidget> {
                       child: IconButton(
                         onPressed: () {
                           if(Deck.flashcards.length > 0) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (BuildContext context) =>  
-                                FlashcardPage(perguntas: Deck.flashcards)),
-                            );
+                            escolherDificuldade(context, Deck);
                           }
                         },
                         icon: Icon(
@@ -360,6 +356,7 @@ class _DecksWidgetState extends State<DecksWidget> {
                       await service.atualizarDeck(deck);
 
                       Navigator.pop(context);
+                      Navigator.pop(context);
                     } finally {
                       setState(() {
                         carregando = false;
@@ -554,10 +551,81 @@ class _DecksWidgetState extends State<DecksWidget> {
       },
     );
   }
+  
+  void escolherDificuldade(BuildContext context, Deck deck) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "Escolha o modo de revisao",
+            style: TextStyle(
+              color: Color.fromARGB(255, 0, 31, 84),
+              fontSize: 20,
+              fontFamily: 'Poppins-bold',
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            
+            children: [
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF001F54),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) =>  
+                      FlashcardPage(perguntas: deck, nivel: 1,)),
+                    );
+                  },
+                  child: Text("Rapida"),
+              ),
+              Container(height: 10,),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF001F54),
+                  ),
+                  onPressed: () {
+                    
+
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) =>  
+                      FlashcardPage(perguntas: deck, nivel: 2,)),
+                    );
+                  },
+                  child: Text("Media"),
+              ),
+              Container(height: 10,),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF001F54),
+                  ),
+                  onPressed: () {
+
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) =>  
+                      FlashcardPage(perguntas: deck, nivel: 3,)),
+                    );
+                  },
+                  child: Text("Fixar conteudo"),
+              ),
+              Container(height: 10,),
+            ],
+
+          )
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Deck>>(
-      future: service.listarDecksDoUsuario("QW9ylT9wLLR9gKcSSoIq"),
+      future: service.listarDecksDoUsuario(widget.idUsuario!),
       builder: (context, snapshot) {
         
 
